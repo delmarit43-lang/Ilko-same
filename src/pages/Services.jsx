@@ -7,25 +7,29 @@ import generalDentistryImg from '../assets/general-dental.png';
 const Services = () => {
   const serviceCategories = [
     {
+      id: 'general',
       title: 'General Dentistry',
       description: 'Comprehensive care for your natural teeth and gums.',
       benefits: ['Routine Examinations', 'Digital X-rays', 'Professional Cleaning', 'Oral Cancer Screening'],
       image: generalDentistryImg
     },
     {
+      id: 'cosmetic',
       title: 'Cosmetic Dentistry',
       description: 'Enhance the appearance of your smile with our aesthetic solutions.',
       benefits: ['Porcelain Veneers', 'Dental Bonding', 'Smile Makeovers', 'Gum Contouring'],
       image: 'https://images.pexels.com/photos/3845653/pexels-photo-3845653.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
     },
     {
+      id: 'implants',
       title: 'Dental Implants',
       description: 'The gold standard for replacing missing teeth permanently.',
       benefits: ['Single Tooth Implants', 'Full Arch Replacement', 'Bone Grafting', 'Computer Guided Surgery'],
       image: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?q=80&w=2070&auto=format&fit=crop'
     },
     {
-      title: 'Orthodontics Dental',
+      id: 'orthodontics',
+      title: 'Orthodontics',
       description: 'Straighten your teeth with modern bracing systems.',
       benefits: ['Invisalign Clear Aligners', 'Traditional Braces', 'Retainers', 'Early Interceptive Care'],
       image: bracesImg
@@ -53,7 +57,7 @@ const Services = () => {
         `}</style>
         <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '5rem' }}>
           {serviceCategories.map((service, index) => (
-            <div key={index} className="service-row" style={{ 
+            <div key={index} id={service.id} className="service-row" style={{ 
               display: 'flex', 
               flexDirection: index % 2 === 0 ? 'row' : 'row-reverse', 
               gap: '4rem', 
@@ -70,7 +74,7 @@ const Services = () => {
                     </div>
                   ))}
                 </div>
-                <Link to="/appointment" className="btn btn-primary">
+                <Link to="/appointment" state={{ service: service.title }} className="btn btn-primary">
                   Book This Service <Calendar size={18} />
                 </Link>
               </div>

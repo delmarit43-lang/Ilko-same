@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const bcrypt = require('bcryptjs');
+const prisma = require('../db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'ilkosamesecretapikey';
 
@@ -24,29 +25,36 @@ router.post('/register', async (req, res) => {
     }
 
     // Check if user exists
-    const userExists = await User.findOne({ email });
+    const userExists = await prisma.user.findUnique({ where: { email } });
     if (userExists) {
       return res.status(400).json({ success: false, message: 'User already exists with this email' });
     }
 
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Create user
-    const userRole = role && ['patient', 'doctor'].includes(role) ? role : 'patient';
-    const user = await User.create({
-      name,
-      email,
-      password,
-      role: userRole
+    const userRole = role && ['patient', 'doctor', 'admin'].includes(role) ? role : 'patient';
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: userRole
+      }
     });
 
     if (user) {
       res.status(201).json({
         success: true,
         data: {
-          _id: user.id,
+          _id: user.id, // keeping _id in response payload for frontend compatibility if needed
+          id: user.id,
           name: user.name,
           email: user.email,
           role: user.role,
-          token: generateToken(user._id, user.role),
+          token: generateToken(user.id, user.role),
         }
       });
     } else {
@@ -66,21 +74,26 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     // Check for user email
-    const user = await User.findOne({ email });
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    if (user && (await user.matchPassword(password))) {
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'You are not registered. Please create an account.' });
+    }
+
+    if (await bcrypt.compare(password, user.password)) {
       res.json({
         success: true,
         data: {
-          _id: user.id,
+          _id: user.id, // keeping _id in response payload for frontend compatibility
+          id: user.id,
           name: user.name,
           email: user.email,
           role: user.role,
-          token: generateToken(user._id, user.role),
+          token: generateToken(user.id, user.role),
         }
       });
     } else {
-      res.status(401).json({ success: false, message: 'Invalid email or password' });
+      res.status(401).json({ success: false, message: 'Invalid password' });
     }
   } catch (error) {
     console.error('Login error:', error);

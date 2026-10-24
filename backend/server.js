@@ -5,24 +5,45 @@ const helmet = require('helmet');
 
 const apiRoutes = require('./routes/api');
 const authRoutes = require('./routes/auth');
-const connectDB = require('./db');
-const User = require('./models/User');
+const prisma = require('./db');
 const bcrypt = require('bcryptjs');
 
-// Models imported inside routes when using mongoose, but connecting DB here.
-connectDB().then(async () => {
-  // Bootstrap default admin
-  const adminExists = await User.findOne({ email: 'admin@ilkosame.com' });
-  if (!adminExists) {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('admin123', salt);
-    await User.create({
-      name: 'System Admin',
-      email: 'admin@ilkosame.com',
-      password: hashedPassword,
-      role: 'admin'
+// Bootstrap default users
+prisma.$connect().then(async () => {
+  try {
+    // Bootstrap default admin
+    const adminEmail = 'admin@ilkosame.com';
+    const adminPassword = await bcrypt.hash('admin123', 10);
+    
+    await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: {},
+      create: {
+        name: 'System Admin',
+        email: adminEmail,
+        password: adminPassword,
+        role: 'admin'
+      }
     });
-    console.log('Default Admin Bootstrap: admin@ilkosame.com / admin123');
+    console.log('✅ Admin account ready: admin@ilkosame.com / admin123');
+
+    // Bootstrap default doctor
+    const doctorEmail = 'doctor@ilkosame.com';
+    const doctorPassword = await bcrypt.hash('doctor123', 10);
+    
+    await prisma.user.upsert({
+      where: { email: doctorEmail },
+      update: {},
+      create: {
+        name: 'Dr. Ahmed Ali',
+        email: doctorEmail,
+        password: doctorPassword,
+        role: 'doctor'
+      }
+    });
+    console.log('✅ Doctor account ready: doctor@ilkosame.com / doctor123');
+  } catch (error) {
+    console.error('Bootstrap error:', error);
   }
 });
 

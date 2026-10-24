@@ -27,16 +27,21 @@ const ServiceCard = ({ title, description, icon, image, link }) => {
       <div style={{ padding: '0 2rem 2rem' }}>
         <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', marginTop: image ? '1.5rem' : 0 }}>{title}</h3>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem', marginBottom: '1.5rem' }}>{description}</p>
-        <Link to={link} style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.5rem', 
-          color: 'var(--primary)', 
-          fontWeight: 600,
-          fontSize: '0.875rem'
-        }}>
-          Learn More <ArrowRight size={16} />
-        </Link>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Link to={link || '/services'} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            color: 'var(--text-muted)', 
+            fontWeight: 500,
+            fontSize: '0.875rem'
+          }}>
+            Learn More <ArrowRight size={16} />
+          </Link>
+          <Link to="/appointment" state={{ service: title }} className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
+            Book Now
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React from 'react';
 import Hero from '../components/Hero';
 import ServiceCard from '../components/ServiceCard';
+import { Link } from 'react-router-dom';
 import { Activity, Beaker, ShieldCheck, Heart, UserRound, Award } from 'lucide-react';
 import generalDentistryImg from '../assets/general-dental.png';
 
@@ -89,6 +90,22 @@ const Home = () => {
             <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.9375rem' }}>"The best dental experience I've ever had. Professional, clean, and the results are amazing!"</p>
             <div style={{ fontWeight: 600 }}>- Sarah Johnston</div>
             <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Patient from Florida, USA</div>
+          </div>
+        </div>
+      </section>
+      <section className="section" style={{ background: 'var(--primary)', color: 'white', textAlign: 'center' }}>
+        <div className="container">
+          <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>Ready to Get Your Perfect Smile?</h2>
+          <p style={{ marginBottom: '2.5rem', fontSize: '1.25rem', opacity: 0.9, maxWidth: '700px', margin: '0 auto 2.5rem' }}>
+            Book your appointment today and experience world-class dental care at Ilko-Same Dental Clinic.
+          </p>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link to="/appointment" className="btn" style={{ background: 'white', color: 'var(--primary)', padding: '1rem 2.5rem', fontSize: '1.1rem', fontWeight: 600 }}>
+              Book Now
+            </Link>
+            <Link to="/contact" className="btn" style={{ border: '2px solid white', color: 'white', padding: '1rem 2.5rem', fontSize: '1.1rem', fontWeight: 600 }}>
+              Contact Us
+            </Link>
           </div>
         </div>
       </section>

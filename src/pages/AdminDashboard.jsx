@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, MessageSquare, User, Mail, Phone, Clock, RefreshCw, ChevronDown, ChevronUp, AlertCircle, Globe } from 'lucide-react';
+import { Calendar, MessageSquare, Mail, Phone, Clock, RefreshCw, ChevronDown, ChevronUp, AlertCircle, Globe, Trash2, CheckCircle, XCircle } from 'lucide-react';
+
+const statusConfig = {
+  pending:   { label: 'Pending',   bg: '#fef9c3', color: '#854d0e' },
+  confirmed: { label: 'Confirmed', bg: '#dcfce7', color: '#166534' },
+  cancelled: { label: 'Cancelled', bg: '#fee2e2', color: '#991b1b' },
+};
 
 const API = 'http://localhost:5000/api';
 
@@ -68,24 +74,45 @@ const AdminDashboard = () => {
         fetch(`${API}/appointments`, { headers }),
         fetch(`${API}/contact`, { headers })
       ]);
-      
       if (apptRes.status === 401 || contRes.status === 401) {
         setError('Your session has expired. Please login again.');
         return;
       }
-
       const apptData = await apptRes.json();
       const contData = await contRes.json();
-      
       if (apptData.success) setAppointments(apptData.data);
       if (contData.success) setContacts(contData.data);
-      
     } catch (err) {
       setError('Could not connect to backend. Make sure the server is running on port 5000.');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  const updateStatus = async (id, status) => {
+    try {
+      const res = await fetch(`${API}/appointments/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      if (data.success) setAppointments(prev => prev.map(a => a._id === id ? { ...a, status } : a));
+    } catch { setError('Failed to update status.'); }
+  };
+
+  const deleteAppointment = async (id) => {
+    if (!window.confirm('Are you sure you want to permanently delete this appointment?')) return;
+    try {
+      const res = await fetch(`${API}/appointments/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) setAppointments(prev => prev.filter(a => a._id !== id));
+      else setError(data.message);
+    } catch { setError('Failed to delete appointment.'); }
   };
 
   useEffect(() => { 
@@ -244,7 +271,7 @@ const AdminDashboard = () => {
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr style={{ background: 'var(--background)' }}>
-                          {['#', 'Patient', 'Contact', 'Service', 'Date', 'Submitted', ''].map((h, i) => (
+                          {['#', 'Patient', 'Contact', 'Service', 'Date', 'Status', 'Actions'].map((h, i) => (
                             <th key={i} style={{
                               padding: '1rem 1.25rem', textAlign: 'left',
                               fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)',
@@ -297,14 +324,34 @@ const AdminDashboard = () => {
                                   {formatDate(appt.date)}
                                 </div>
                               </td>
-                              <td style={{ padding: '1rem 1.25rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                {formatDateTime(appt.createdAt)}
+                              <td style={{ padding: '1rem 1.25rem' }}>
+                                {(() => { const sc = statusConfig[appt.status] || statusConfig.pending; return (
+                                  <span style={{ padding: '0.35rem 0.9rem', background: sc.bg, color: sc.color, borderRadius: '999px', fontSize: '0.8rem', fontWeight: 600 }}>{sc.label}</span>
+                                ); })()}
                               </td>
                               <td style={{ padding: '1rem 1.25rem' }}>
-                                <button onClick={() => setExpandedRow(expandedRow === appt._id ? null : appt._id)}
-                                  style={{ background: 'var(--border)', border: 'none', borderRadius: '0.5rem', padding: '0.375rem 0.625rem', cursor: 'pointer', color: 'var(--text-muted)' }}>
-                                  {expandedRow === appt._id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                </button>
+                                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                                  {appt.status === 'pending' && (
+                                    <>
+                                      <button onClick={() => updateStatus(appt._id, 'confirmed')} title="Confirm"
+                                        style={{ background: '#dcfce7', border: 'none', color: '#166534', padding: '0.35rem 0.5rem', borderRadius: '0.4rem', cursor: 'pointer' }}>
+                                        <CheckCircle size={14} />
+                                      </button>
+                                      <button onClick={() => updateStatus(appt._id, 'cancelled')} title="Decline"
+                                        style={{ background: '#fef9c3', border: 'none', color: '#854d0e', padding: '0.35rem 0.5rem', borderRadius: '0.4rem', cursor: 'pointer' }}>
+                                        <XCircle size={14} />
+                                      </button>
+                                    </>
+                                  )}
+                                  <button onClick={() => deleteAppointment(appt._id)} title="Delete permanently"
+                                    style={{ background: '#fee2e2', border: 'none', color: '#dc2626', padding: '0.35rem 0.5rem', borderRadius: '0.4rem', cursor: 'pointer' }}>
+                                    <Trash2 size={14} />
+                                  </button>
+                                  <button onClick={() => setExpandedRow(expandedRow === appt._id ? null : appt._id)}
+                                    style={{ background: 'var(--border)', border: 'none', borderRadius: '0.4rem', padding: '0.35rem 0.5rem', cursor: 'pointer', color: 'var(--text-muted)' }}>
+                                    {expandedRow === appt._id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                             {expandedRow === appt._id && (

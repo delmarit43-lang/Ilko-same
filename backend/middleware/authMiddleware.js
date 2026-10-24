@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const prisma = require('../db');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'ilkosamesecretapikey';
-
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('FATAL ERROR: JWT_SECRET is not defined in the environment variables.');
+}
 const protect = async (req, res, next) => {
   let token;
 
@@ -17,8 +19,11 @@ const protect = async (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, JWT_SECRET);
 
-      // Get user from the token
-      req.user = await User.findById(decoded.id).select('-password');
+      // Get user from the token, omitting the password
+      req.user = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        select: { id: true, name: true, email: true, role: true }
+      });
       
       if (!req.user) {
         return res.status(401).json({ success: false, message: 'Not authorized, user not found' });

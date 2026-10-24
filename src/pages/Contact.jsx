@@ -61,7 +61,7 @@ const Contact = () => {
             <div className="card" style={{ textAlign: 'center', padding: '1.5rem' }}>
               <div style={{ color: 'var(--primary)', marginBottom: '1rem' }}><Phone size={24} style={{ margin: '0 auto' }} /></div>
               <h4 style={{ fontSize: '1.1rem' }}>Call Us</h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>252634579898</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>+252 ...</p>
             </div>
             <div className="card" style={{ textAlign: 'center', padding: '1.5rem' }}>
               <div style={{ color: 'var(--primary)', marginBottom: '1rem' }}><Mail size={24} style={{ margin: '0 auto' }} /></div>
@@ -142,7 +142,7 @@ const Contact = () => {
       </section>
 
       {/* WhatsApp Integration Button */}
-      <a href="https://wa.me/252634579898" target="_blank" rel="noreferrer" style={{
+      <a href="https://wa.me/+252..." target="_blank" rel="noreferrer" style={{
         position: 'fixed',
         bottom: '2rem',
         right: '2rem',

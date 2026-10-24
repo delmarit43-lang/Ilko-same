@@ -28,22 +28,23 @@ const Footer = () => {
               <li><Link to="/services">Our Services</Link></li>
               <li><Link to="/doctors">Our Doctors</Link></li>
               <li><Link to="/testimonials">Testimonials</Link></li>
+              <li><Link to="/appointment" style={{ color: 'var(--primary)', fontWeight: 600 }}>Book Appointment</Link></li>
             </ul>
           </div>
           <div>
             <h4 style={{ marginBottom: '1.5rem' }}>Our Services</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.9rem' }}>
-              <li>General Dentistry</li>
-              <li>Cosmetic Dentistry</li>
-              <li>Dental Implants</li>
-              <li>Orthodontics</li>
+              <li><Link to="/services#general">General Dentistry</Link></li>
+              <li><Link to="/services#cosmetic">Cosmetic Dentistry</Link></li>
+              <li><Link to="/services#implants">Dental Implants</Link></li>
+              <li><Link to="/services#orthodontics">Orthodontics</Link></li>
             </ul>
           </div>
           <div>
             <h4 style={{ marginBottom: '1.5rem' }}>Contact Info</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Phone size={14} /> 252634579898
+                <Phone size={14} /> +252 ...
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Mail size={14} /> ilko-same@gmail.com
